@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import "./App.css";
 
 const Counter = () => {
     const [count, setCount] = useState(() => {
@@ -9,6 +10,12 @@ const Counter = () => {
     });
     const [isRunning, setIsRunning] = useState(false);
     const [darkMode, setDarkMode] = useState(() => JSON.parse(localStorage.getItem("darkMode")) || false);
+    const [inputValue, setInputValue] = useState("");
+    const [animate, setAnimate] = useState(false);
+
+    const minValue = 0;
+    const maxValue = 100;
+    const sound = new Audio("/soundCounter.mp3");
 
     useEffect(() => {
         localStorage.setItem("count", count);
@@ -33,8 +40,25 @@ const Counter = () => {
     }, [isRunning]);
 
     const updateCount = (newCount) => {
-        setHistory([...history,count]);
-        setCount(newCount);
+        if(newCount >= minValue && newCount <= maxValue)
+        {
+            sound.play();
+            setHistory([...history,count]);
+            setCount(newCount);
+
+            setAnimate(false);  // 🔹 Najpierw usuwamy klasę
+            setTimeout(() => {
+                setCount(newCount);
+                setAnimate(true); // 🔹 Po krótkim czasie dodajemy ją ponownie
+            }, 10);
+        }
+    };
+
+    const resetCounter = () => {
+        setCount(0);
+        setHistory([]);
+        localStorage.removeItem("count");
+        localStorage.removeItem("history");
     };
 
 return (
@@ -45,12 +69,24 @@ return (
         color: darkMode ? "#fff" : "#000",
         minHeight: "100vh",
         padding: "20px"
+        
         }}>
-        <h1>Counter: {count}</h1>
+         <h1 className={animate ? "pulse" : ""}>Counter: {count}</h1>
         <button onClick={() => updateCount(count+1)}>Increase</button>
         <button onClick={() => updateCount(count-1)}>Decrease</button>
-        <button onClick={() => updateCount(0)}>Reset</button>
-    
+        <button onClick={resetCounter}>Reset</button>
+        <br></br><br></br>
+        <button onClick={() => setCount(Number(inputValue))}>
+            Set value
+        </button>
+        <input
+            type="number"
+            min="0"
+            max="100"
+            value={inputValue}
+            onChange={(e) => setInputValue(e.target.value)}
+        />
+
     <h2>Change history:</h2>
     <ul>
         {history.map((value, index) => (
@@ -66,6 +102,8 @@ return (
     <button onClick={() => setDarkMode(!darkMode)}>
         {darkMode ? "Light" : "Dark"}
     </button>
+
+    <button className="test">Test</button>
     </div>
  );
 };
