@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import "./App.css";
+import {LineChart, Line, XAxis, YAxis, Tooltip} from 'recharts';
 
 const Counter = () => {
     const [count, setCount] = useState(() => {
@@ -46,10 +47,10 @@ const Counter = () => {
             setHistory([...history,count]);
             setCount(newCount);
 
-            setAnimate(false);  // 🔹 Najpierw usuwamy klasę
+            setAnimate(false); 
             setTimeout(() => {
                 setCount(newCount);
-                setAnimate(true); // 🔹 Po krótkim czasie dodajemy ją ponownie
+                setAnimate(true); 
             }, 10);
         }
     };
@@ -103,8 +104,14 @@ return (
         {darkMode ? "Light" : "Dark"}
     </button>
 
-    <button className="test">Test</button>
-    </div>
+<LineChart width={300} height={200} data={history.map((value, index) => ({ index, value }))}>
+    <Line type="monotone" dataKey="value" stroke="#8884d8" animationDuration={500}  />
+    <XAxis dataKey="index" />
+    <YAxis />
+    <Tooltip />
+</LineChart>
+
+</div>
  );
 };
 
